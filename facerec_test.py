@@ -22,4 +22,4 @@ cap = cv2.VideoCamera(0)
 
 while True:
     ret, img = cap.read()
-    
+

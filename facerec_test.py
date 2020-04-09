@@ -1,19 +1,22 @@
 import cv2
 import numpy as np
 from threading import Thread
+import base64
 
 net = cv2.dnn.readNetFromCaffe("./deploy.prototxt", "ssd_model.caffemodel")
-
 
 cap = cv2.VideoCapture("http://192.168.1.3:1024/video")
 
 
-def detect(img, conf_treshold=0.12):
+def detect(img_base64, img_shape, conf_treshold=0.12):
+    img = np.frombuffer(base64.b64decode(img_base64), dtype=np.uint8)
+    img = img.reshape(img_shape)
+
     blob = cv2.dnn.blobFromImage(
         cv2.resize(img, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0)
     )
 
-    (h, w) = img.shape[:2]
+    (h, w) = img_shape[:2]
 
     net.setInput(blob)
     detections = net.forward()
@@ -32,7 +35,10 @@ def detect(img, conf_treshold=0.12):
 while True:
     ret, img = cap.read()
 
-    detections = detect(img)
+    img_shape = img.shape
+    img_base64 = base64.b64encode(img).decode("ASCII")
+    detections = detect(img_base64, img_shape, 0.20)
+
     faces = []
 
     for box in detections:
@@ -40,11 +46,6 @@ while True:
         faces.append(img[startY:endY, startX:endX])
 
     for i, face in enumerate(faces):
-        try:
-            cv2.imshow("face{}".format(i), face)
-        except:
-            pass
-
         (startX, startY, endX, endY) = detections[i]
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 255, 0), 2)
 

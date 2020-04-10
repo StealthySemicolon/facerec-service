@@ -2,7 +2,7 @@ import requests
 import cv2
 import base64
 
-URL = "http://127.0.0.1:5000/detect"
+URL = "http://localhost:5000/detect"
 
 
 def detect(img, conf_treshold=0.12):

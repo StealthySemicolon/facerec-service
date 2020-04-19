@@ -6,6 +6,29 @@ import cv2
 app = Flask(__name__)
 net = cv2.dnn.readNetFromCaffe("./deploy.prototxt", "ssd_model.caffemodel")
 
+def bounds_to_square(bounds):
+    startX, startY, endX, endY = bounds
+
+    width = endX - startX
+    height = endY - startY
+
+    if width % 2 != 0: endX += 1
+    if height % 2 != 0: endY += 1
+    
+    width = endX - startX
+    height = endY - startY
+
+    if width > height:
+        const = (width - height)/2
+        endY += const
+        startY -= const
+    if height > width:
+        const = (height - width)/2
+        endX += const
+        startX -= const
+    
+    return (int(startX), int(startY), int(endX), int(endY))
+
 
 def detect_from_base64(img_base64, img_shape, conf_treshold):
     conf_treshold = conf_treshold if conf_treshold >= 0.05 else 0.05
@@ -28,7 +51,7 @@ def detect_from_base64(img_base64, img_shape, conf_treshold):
         if confidence < conf_treshold:
             continue
         box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-        output.append(box.astype("int"))
+        output.append(bounds_to_square(box))
 
     return output
 

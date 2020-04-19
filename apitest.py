@@ -9,7 +9,6 @@ URL = "http://127.0.0.1:5000/detect"
 def detect(img, conf_treshold=0.12):
     img_base64 = base64.b64encode(img).decode("ascii")
     img_shape = img.shape
-    conf_treshold = 0.12
 
     post_data = {
         "img_base64": img_base64,
@@ -44,12 +43,12 @@ class ThreadedCapture:
         self.stopped = True
 
 
-cap = ThreadedCapture("http://192.168.1.3:1024/video").start()
+cap = ThreadedCapture(0).start()
 ret, img = cap.read()
 
 while True:
     ret, img = cap.read()
-    detections = detect(img, 0.20)
+    detections = detect(img, 0.50)
 
     faces = []
 

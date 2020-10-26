@@ -3,6 +3,7 @@ import cv2
 import base64
 from threading import Thread
 
+
 URL = "http://127.0.0.1:5000/detect"
 
 
@@ -44,7 +45,7 @@ class ThreadedCapture:
         self.stopped = True
 
 
-cap = ThreadedCapture("http://192.168.1.3:1024/video").start()
+cap = ThreadedCapture("test.mp4").start()
 ret, img = cap.read()
 
 while True:
